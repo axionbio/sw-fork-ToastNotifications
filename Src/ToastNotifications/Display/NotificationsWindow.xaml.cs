@@ -57,18 +57,15 @@ namespace ToastNotifications.Display
 
         private void RecomputeLayout()
         {
-            Dispatcher.Invoke(((Action)(() =>
+            if (!Dispatcher.CheckAccess())
             {
-                if (NotificationsList.GetItemCount() == 0)
-                {
-                    this.Visibility = Visibility.Collapsed;
-                }
-                else
-                {
-                    this.Visibility = Visibility.Visible;
-                }
-    
-            })), DispatcherPriority.Render);
+                Dispatcher.Invoke(new Action(RecomputeLayout), DispatcherPriority.Render);
+                return;
+            }
+
+            this.Visibility = NotificationsList.GetItemCount() == 0
+                ? Visibility.Collapsed
+                : Visibility.Visible;
         }
 
         public void SetEjectDirection(EjectDirection ejectDirection)
