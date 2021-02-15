@@ -1,4 +1,4 @@
-param([string]$version="2.5.3.0")
+param([string]$version="2.5.4.0")
 
 $env:Path += ";C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\Common7\IDE"
 $projects = "ToastNotifications", "ToastNotifications.Messages"
