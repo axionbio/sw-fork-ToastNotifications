@@ -22,7 +22,7 @@ namespace ToastNotifications.Display
         public NotificationsDisplaySupervisor(Dispatcher dispatcher,
             IPositionProvider positionProvider,
             INotificationsLifetimeSupervisor lifetimeSupervisor,
-            DisplayOptions displayOptions, 
+            DisplayOptions displayOptions,
             IKeyboardEventHandler keyboardEventHandler)
         {
             _dispatcher = dispatcher;
@@ -41,7 +41,10 @@ namespace ToastNotifications.Display
 
         public void DisplayNotification(INotification notification)
         {
-            Dispatch(() => InternalDisplayNotification(notification));
+            if (_dispatcher.CheckAccess())
+                InternalDisplayNotification(notification);
+            else
+                Dispatch(() => InternalDisplayNotification(notification));
         }
 
         private void InternalDisplayNotification(INotification notification)
@@ -56,12 +59,15 @@ namespace ToastNotifications.Display
 
         private void Close(INotification notification)
         {
-            Dispatch(() => InternalClose(notification));
+            if (_dispatcher.CheckAccess())
+                InternalClose(notification);
+            else
+                Dispatch(() => InternalClose(notification));
         }
 
         private void InternalClose(INotification notification)
         {
-            //Handle a case where client calls CustomMessage.Close() 
+            //Handle a case where client calls CustomMessage.Close()
             //but this object has already been disposed
             if (_lifetimeSupervisor == null)
                 return;
@@ -126,7 +132,7 @@ namespace ToastNotifications.Display
             if (notification != null)
             {
                 notification.DisplayPart.OnClose();
-                DelayAction.Execute(TimeSpan.FromMilliseconds(300), 
+                DelayAction.Execute(TimeSpan.FromMilliseconds(300),
                     () => _window?.CloseNotification(notification.DisplayPart),
                     _dispatcher);
             }
