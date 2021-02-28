@@ -8,7 +8,7 @@ If no arguments are given uses whatever version is set in the default project (S
 
 If "-bump" is given as the argument the script will get the current build number and increase the revision by 1.
 
-If "-version" followed by a numerical version is given as the argument, the following happens: 
+If "-version" followed by a numerical version is given as the argument, the following happens:
 
 If argument is "x", new version is x.0.0.0.
 If argument is "x.y", new version is x.y.0.0.
@@ -39,7 +39,7 @@ param
 
     [Parameter(Mandatory=$false)]
     [switch]
-    $Push=$false 
+    $Push=$false
 )
 
 # ---------------------------------------------------------------
@@ -62,7 +62,7 @@ $Global:Projects = "ToastNotifications", "ToastNotifications.Messages"
 function CheckForDirtyFiles
 {
     Write-Verbose "Checking for dirty files`n"
-   
+
     $GitCleanResult = (git status --porcelain)
     Write-Verbose "git status result is $GitCleanResult"
 
@@ -71,15 +71,15 @@ function CheckForDirtyFiles
         Write-Host "`nYou have some dirty files. Consider a 'git reset --hard HEAD' or a 'git clean -dfx' before revving the version`n" -ForegroundColor Red
         exit
     }
-	
-	$CurrentBranch = (git branch --show-current)
-	
-	if ($CurrentBranch -ne "main")
-	{
-		Write-Host "Current branch is not main!" -ForegroundColor Red
-		exit
-	}
-    
+
+    $CurrentBranch = (git branch --show-current)
+
+    if ($CurrentBranch -ne "main")
+    {
+        Write-Host "Current branch is not main!" -ForegroundColor Red
+        exit
+    }
+
     Write-Verbose "Your repository is clean! Proceeding to getting your versions.`n"
     return
 }
@@ -96,11 +96,11 @@ function VerifyInput
         return
     }
     if ($Bump)
-    {        
-    # "Bump and go to SetVersion"
+    {
+        # "Bump and go to SetVersion"
         return
     }
-    
+
     $fVersionInput = $Version.ToString().Split(".")
 
     # Check Length <= 4
@@ -109,23 +109,23 @@ function VerifyInput
         "`nToo many numbers. Invalid version."
         exit
     }
-    # Check for Valid digits 
-    for ($i = 0;$i -lt $fVersionInput.Length; $i++) 
+    # Check for Valid digits
+    for ($i = 0;$i -lt $fVersionInput.Length; $i++)
     {
         if ($fVersionInput[$i] -notmatch "\d+")
         {
             "Invaild input ($fVersionInput)"
             "'Version Component is not a number"
-            exit 
+            exit
         }
-    } 
+    }
     # If you're here: you have 1 -> 4 digits
     $Global:Major    = If ($fVersionInput[0]) { $fVersionInput[0] } Else {"0"}
     $Global:Minor    = If ($fVersionInput[1]) { $fVersionInput[1] } Else {"0"}
     $Global:Build    = If ($fVersionInput[2]) { $fVersionInput[2] } Else {"0"}
     $Global:Revision = If ($fVersionInput[3]) { $fVersionInput[3] } Else {"0"}
-     
-    Write-Verbose "Major = $Global:Major"   
+
+    Write-Verbose "Major = $Global:Major"
     Write-Verbose "Minor = $Global:Minor"
     Write-Verbose "Build = $Global:Build"
     Write-Verbose "Revision = $Global:Revision"
@@ -137,19 +137,19 @@ function VerifyInput
 # -----------------------------------------------------------------
 function SetVersion
 {
-	if (!$Version -and !$Bump)
-	{
-		return
-	}
+    if (!$Version -and !$Bump)
+    {
+        return
+    }
 
     # If Bumping
     if ($Bump)
-    {    
-		#Get-Content from the first project
-		$fSoftwareVersionFile = "../Src/" + $Global:Projects[0] + "/Properties/AssemblyInfo.cs"
-	
+    {
+        #Get-Content from the first project
+        $fSoftwareVersionFile = "../Src/" + $Global:Projects[0] + "/Properties/AssemblyInfo.cs"
+
         # Get current version from *.cs
-        # Search though file For Version Number 
+        # Search though file For Version Number
         $Search = Select-String -Path $fSoftwareVersionFile -Pattern "AssemblyVersion" | ForEach-Object{$_.Line}
         $match = $Search[1] -match '\d+\.\d+\.\d+\.\d+'
         $fDigit = $Matches[0]
@@ -160,15 +160,15 @@ function SetVersion
         $Global:Build = $fDigit.split(".")[2]
         $Global:Revision = [int]$fDigit.split(".")[3] + [int]1
 
-       #"Bump status = $Global:Shouldbump and revision = $Global:Revision" 
+       #"Bump status = $Global:Shouldbump and revision = $Global:Revision"
        "`nCurrent version is $Global:Major.$Global:Minor.$Global:Build.$([int]$fDigit.split(".")[3])."
-       
-       Write-Verbose "Bump status = $Bump and new revision = $Global:Revision." 
+
+       Write-Verbose "Bump status = $Bump and new revision = $Global:Revision."
     }
 
     $Global:NewVersion = "$Global:Major.$Global:Minor.$Global:Build.$Global:Revision"
-	
-	Write-Host "Setting version " + $Global:NewVersion
+
+    Write-Host "Setting version " + $Global:NewVersion
 
     $versionRegexp = "(\d+\.\d+\.\d+\.\d+)"
 
@@ -187,12 +187,12 @@ function CommitNewVersion
     # Adding and commiting
     git add -u
     git commit -m "Bump to $Global:NewVersion"
-    
-    if($Push) 
+
+    if($Push)
     {
-        "Pushing up to origin."        
+        "Pushing up to origin."
         git push
-    } 
+    }
     else
     {
         "
@@ -211,14 +211,14 @@ function CommitNewVersion
 
 function BuildAndPackage
 {
-	$solution = "../Src/ToastNotifications.sln"
-	
-	devenv $solution /rebuild Release
+    $solution = "../Src/ToastNotifications.sln"
 
-	foreach ($project in $Global:Projects) {
-		$csprojFile = "../Src/"+$project+"/"+$project+".csproj"
-		./nuget.exe pack $csprojFile -Prop Configuration=Release
-	}
+    devenv $solution /rebuild Release
+
+    foreach ($project in $Global:Projects) {
+        $csprojFile = "../Src/"+$project+"/"+$project+".csproj"
+        ./nuget.exe pack $csprojFile -Prop Configuration=Release
+    }
 }
 
 # Check that everything is checked-in
