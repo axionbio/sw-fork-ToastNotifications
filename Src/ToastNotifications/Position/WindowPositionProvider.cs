@@ -24,6 +24,7 @@ namespace ToastNotifications.Position
             parentWindow.LocationChanged += ParentWindowOnLocationChanged;
             parentWindow.StateChanged += ParentWindowOnStateChanged;
             parentWindow.Activated += ParentWindowOnActivated;
+            parentWindow.IsVisibleChanged += ParentWindowOnVisibleChanged;
 
             SetEjectDirection(corner);
         }
@@ -113,6 +114,7 @@ namespace ToastNotifications.Position
             ParentWindow.SizeChanged -= ParentWindowOnSizeChanged;
             ParentWindow.StateChanged -= ParentWindowOnStateChanged;
             ParentWindow.Activated -= ParentWindowOnActivated;
+            ParentWindow.IsVisibleChanged -= ParentWindowOnVisibleChanged;
         }
 
         protected virtual void RequestUpdatePosition()
@@ -120,6 +122,11 @@ namespace ToastNotifications.Position
             UpdateHeightRequested?.Invoke(this, EventArgs.Empty);
             UpdateEjectDirectionRequested?.Invoke(this, EventArgs.Empty);
             UpdatePositionRequested?.Invoke(this, EventArgs.Empty);
+        }
+
+        protected virtual void RequestUpdateVisible()
+        {
+            UpdateVisibleRequested?.Invoke(this, EventArgs.Empty);
         }
 
         private void ParentWindowOnLocationChanged(object sender, EventArgs eventArgs)
@@ -142,10 +149,17 @@ namespace ToastNotifications.Position
             RequestUpdatePosition();
         }
 
+        private void ParentWindowOnVisibleChanged(object sender, DependencyPropertyChangedEventArgs eventArgs)
+        {
+            RequestUpdateVisible();
+        }
+
         public event EventHandler UpdatePositionRequested;
 
         public event EventHandler UpdateEjectDirectionRequested;
 
         public event EventHandler UpdateHeightRequested;
+
+        public event EventHandler UpdateVisibleRequested;
     }
 }

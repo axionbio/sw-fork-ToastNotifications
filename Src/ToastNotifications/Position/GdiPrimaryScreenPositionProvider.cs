@@ -207,6 +207,8 @@ namespace ToastNotifications.Position
         public event EventHandler UpdateEjectDirectionRequested;
 
         public event EventHandler UpdateHeightRequested;
+
+        public event EventHandler UpdateVisibleRequested;
 #pragma warning restore CS0067
     }
 }
