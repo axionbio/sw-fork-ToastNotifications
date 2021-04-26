@@ -13,5 +13,6 @@ namespace ToastNotifications.Core
         event EventHandler UpdatePositionRequested;
         event EventHandler UpdateEjectDirectionRequested;
         event EventHandler UpdateHeightRequested;
+        event EventHandler UpdateVisibleRequested;
     }
 }

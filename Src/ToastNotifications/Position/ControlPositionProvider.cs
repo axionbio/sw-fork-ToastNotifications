@@ -26,6 +26,7 @@ namespace ToastNotifications.Position
 
             parentWindow.SizeChanged += ParentWindowOnSizeChanged;
             parentWindow.LocationChanged += ParentWindowOnLocationChanged;
+            parentWindow.IsVisibleChanged += ParentWindowOnVisibleChanged;
 
             SetEjectDirection(corner);
         }
@@ -122,11 +123,17 @@ namespace ToastNotifications.Position
         {
             ParentWindow.LocationChanged -= ParentWindowOnLocationChanged;
             ParentWindow.SizeChanged -= ParentWindowOnSizeChanged;
+            ParentWindow.IsVisibleChanged -= ParentWindowOnVisibleChanged;
         }
 
         protected virtual void RequestUpdatePosition()
         {
             UpdatePositionRequested?.Invoke(this, EventArgs.Empty);
+        }
+
+        protected virtual void RequestUpdateVisible()
+        {
+            UpdateVisibleRequested?.Invoke(this, EventArgs.Empty);
         }
 
         private void ParentWindowOnLocationChanged(object sender, EventArgs eventArgs)
@@ -138,12 +145,19 @@ namespace ToastNotifications.Position
         {
             RequestUpdatePosition();
         }
+
+        private void ParentWindowOnVisibleChanged(object sender, DependencyPropertyChangedEventArgs eventArgs)
+        {
+            RequestUpdateVisible();
+        }
 #pragma warning disable CS0067
-		public event EventHandler UpdatePositionRequested;
+        public event EventHandler UpdatePositionRequested;
 
         public event EventHandler UpdateEjectDirectionRequested;
 
         public event EventHandler UpdateHeightRequested;
+
+        public event EventHandler UpdateVisibleRequested;
 #pragma warning restore CS0067
-	}
+    }
 }

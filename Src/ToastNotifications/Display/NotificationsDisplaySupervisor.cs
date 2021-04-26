@@ -37,6 +37,7 @@ namespace ToastNotifications.Display
             _positionProvider.UpdatePositionRequested += PositionProviderOnUpdatePositionRequested;
             _positionProvider.UpdateEjectDirectionRequested += PositionProviderOnUpdateEjectDirectionRequested;
             _positionProvider.UpdateHeightRequested += PositionProviderOnUpdateHeightRequested;
+            _positionProvider.UpdateVisibleRequested += PositionProviderOnUpdateVisibleRequested;
         }
 
         public void DisplayNotification(INotification notification)
@@ -97,6 +98,16 @@ namespace ToastNotifications.Display
             }
         }
 
+        private void ShowWindow()
+        {
+            _window.Show();
+        }
+
+        private void HideWindow()
+        {
+            _window.Hide();
+        }
+
         private void UpdateWindowPosition()
         {
             if(_window == null || !_window.IsLoaded)
@@ -121,6 +132,18 @@ namespace ToastNotifications.Display
             _window.Height = height;
         }
 
+        private void UpdateVisible()
+        {
+            if (_positionProvider.ParentWindow.IsVisible)
+            {
+                ShowWindow();
+            }
+            else
+            {
+                HideWindow();
+            }
+        }
+
         private void ShowNotification(INotification notification)
         {
             notification.Bind(Close);
@@ -136,11 +159,6 @@ namespace ToastNotifications.Display
                     () => _window?.CloseNotification(notification.DisplayPart),
                     _dispatcher);
             }
-        }
-
-        private void ShowWindow()
-        {
-            _window.Show();
         }
 
         private void LifetimeSupervisorOnShowNotificationRequested(object sender, ShowNotificationEventArgs eventArgs)
@@ -168,6 +186,11 @@ namespace ToastNotifications.Display
             UpdateHeight();
         }
 
+        private void PositionProviderOnUpdateVisibleRequested(object sender, EventArgs eventArgs)
+        {
+            UpdateVisible();
+        }
+
         public void Dispose()
         {
             _window?.Close();
@@ -179,6 +202,7 @@ namespace ToastNotifications.Display
             _positionProvider.UpdatePositionRequested -= PositionProviderOnUpdatePositionRequested;
             _positionProvider.UpdateEjectDirectionRequested -= PositionProviderOnUpdateEjectDirectionRequested;
             _positionProvider.UpdateHeightRequested -= PositionProviderOnUpdateHeightRequested;
+            _positionProvider.UpdateVisibleRequested -= PositionProviderOnUpdateVisibleRequested;
 
             _lifetimeSupervisor = null;
         }
