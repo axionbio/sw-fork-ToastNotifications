@@ -145,13 +145,12 @@ function SetVersion
     # If Bumping
     if ($Bump)
     {
-        #Get-Content from the first project
-        $fSoftwareVersionFile = "../Src/" + $Global:Projects[0] + "/Properties/AssemblyInfo.cs"
+        # Get-Content from the first project
+        $fSoftwareVersionFile = "../Src/" + $Global:Projects[0] + "/" + $Global:Projects[0] + ".csproj"
 
-        # Get current version from *.cs
         # Search though file For Version Number
         $Search = Select-String -Path $fSoftwareVersionFile -Pattern "AssemblyVersion" | ForEach-Object{$_.Line}
-        $match = $Search[1] -match '\d+\.\d+\.\d+\.\d+'
+        $match = $Search -match '\d+\.\d+\.\d+\.\d+'
         $fDigit = $Matches[0]
 
         # Set $Major, $Minor, $Build to numbers from files
@@ -173,7 +172,7 @@ function SetVersion
     $versionRegexp = "(\d+\.\d+\.\d+\.\d+)"
 
     foreach ($project in $Global:Projects) {
-       $assemblyInfoFile = "../Src/"+$project+"/Properties/AssemblyInfo.cs"
+       $assemblyInfoFile = "../Src/"+$project+"/$project.csproj"
        (Get-Content $assemblyInfoFile) -replace $versionRegexp, $Global:NewVersion | Set-Content $assemblyInfoFile
     }
 }
@@ -217,7 +216,7 @@ function BuildAndPackage
 
     foreach ($project in $Global:Projects) {
         $csprojFile = "../Src/"+$project+"/"+$project+".csproj"
-        ./nuget.exe pack $csprojFile -Prop Configuration=Release
+        dotnet pack $csprojFile --configuration Release
     }
 }
 
