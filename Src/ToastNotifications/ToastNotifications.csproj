@@ -12,9 +12,9 @@
         It's extendable, it gives you possibility to create custom and interactive notifications in simply manner.
     </Description>
     <Copyright>Copyright © Rafał Łopatka 2018</Copyright>
-    <Version>2.5.4.1</Version>
-    <AssemblyVersion>2.5.4.1</AssemblyVersion>
-    <FileVersion>2.5.4.1</FileVersion>
+    <Version>2.5.4.2</Version>
+    <AssemblyVersion>2.5.4.2</AssemblyVersion>
+    <FileVersion>2.5.4.2</FileVersion>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <Authors>DevCrew.pl Rafał Łopatka and Axion BioSystems</Authors>
